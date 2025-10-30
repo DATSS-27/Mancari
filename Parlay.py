@@ -338,14 +338,15 @@ async def daily_task(context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             logger.warning(f"Gagal kirim ke {chat_id}: {e}")
 
-# === MAIN ===
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start_handler))
     app.add_handler(CommandHandler("unsubscribe", unsubscribe_handler))
     app.add_handler(CommandHandler("get", get_handler))
-    app.job_queue.run_daily(daily_task, time=datetime.strptime("07:00", "%H:%M").time(), name="daily_task", tzinfo=ZoneInfo("Asia/Makassar"))
+    app.job_queue.run_daily(
+        daily_task,
+        time=datetime.strptime("07:00", "%H:%M").time(),
+        name="daily_task",
+        tzinfo=ZoneInfo("Asia/Makassar"),
+    )
     app.run_polling()
-
-if __name__ == "__main__":
-    main()
