@@ -1,0 +1,23 @@
+[
+  { "id": 1, "nama": "World Cup", "negara": "World" },
+  { "id": 2, "nama": "UEFA Champions League", "negara": "World" },
+  { "id": 3, "nama": "UEFA Europa League", "negara": "World" },
+  { "id": 4, "nama": "Euro Championship", "negara": "World" },
+  { "id": 5, "nama": "UEFA Nations League", "negara": "World" },
+  { "id": 9, "nama": "Copa America", "negara": "World" },
+  { "id": 15, "nama": "FIFA Club World Cup", "negara": "World" },
+  { "id": 39, "nama": "Premier League", "negara": "England" },
+  { "id": 61, "nama": "Ligue 1", "negara": "France" },
+  { "id": 71, "nama": "Serie A", "negara": "Brazil" },
+  { "id": 78, "nama": "Bundesliga", "negara": "Germany" },
+  { "id": 88, "nama": "Eredivisie", "negara": "Netherlands" },
+  { "id": 94, "nama": "Primeira Liga", "negara": "Portugal" },
+  { "id": 98, "nama": "J1 League", "negara": "Japan" },
+  { "id": 128, "nama": "Liga Profesional", "negara": "Argentina" },
+  { "id": 135, "nama": "Serie A", "negara": "Italy" },
+  { "id": 140, "nama": "La Liga", "negara": "Spain" },
+  { "id": 188, "nama": "A-League", "negara": "Australia" },
+  { "id": 203, "nama": "Süper Lig", "negara": "Turkey" },
+  { "id": 253, "nama": "Major League Soccer", "negara": "USA" },
+  { "id": 292, "nama": "K League 1", "negara": "South-Korea" }
+]
