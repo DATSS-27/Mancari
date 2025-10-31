@@ -220,7 +220,7 @@ def main():
 
     # Jalankan webhook server
     app.run_webhook(
-        listen="0.0.0.0",
+        listen="8.0.8.0",
         port=PORT,
         url_path=f"{BOT_TOKEN}",
         webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}"
@@ -228,3 +228,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
