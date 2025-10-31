@@ -154,7 +154,8 @@ async def get_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         league_map = load_league_map()
         async with aiohttp.ClientSession(headers=HEADERS) as session:
             sem = asyncio.Semaphore(CONCURRENT_PREDICTIONS)
-            tasks = [fetch_fixtures_for_league(session, lid) for lid in league_map.keys()]
+            league_ids = [item["id"] for item in league_map]
+            tasks = [fetch_fixtures_for_league(session, lid) for lid in league_ids]
             all_results = await asyncio.gather(*tasks)
 
             fixtures = []
@@ -228,5 +229,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
