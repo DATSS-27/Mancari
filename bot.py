@@ -354,11 +354,17 @@ async def prediksi(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     excel = build_predictions_excel(predictions)
-
+    leagues = context.bot_data.get("leagues", {})
+    league_names = [leagues[lid] for lid in sorted(SELECTED_LEAGUE_IDS)]
+    
+    caption = (
+        f"📊 Prediksi {len(predictions)} pertandingan\n"
+        "🏆 Liga:\n• " + "\n• ".join(league_names)
+    )
     await context.bot.send_document(
         chat_id=chat_id,
         document=InputFile(excel, filename="predictions.xlsx"),
-        caption=f"📊 Prediksi {len(predictions)} pertandingan\n🏆 {SELECTED_LEAGUE['name']}"
+        caption=caption
     )
 
     await msg.delete()
@@ -387,6 +393,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
