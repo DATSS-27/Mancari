@@ -44,6 +44,7 @@ STATE_FILE = "state.json"
 # ======================================================
 SELECTED_LEAGUE = {}
 FIXTURE_IDS = []
+SELECTED_LEAGUE_IDS = set()
 
 # ======================================================
 # STATE FILE HANDLER (PALING AMAN UNTUK RAILWAY FREE)
@@ -386,6 +387,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
