@@ -116,25 +116,25 @@ def build_predictions_excel(predictions):
             return 0.0
         
     for p in predictions:
-    att_h = to_float(p["home_last5"].get("att"))
-    att_a = to_float(p["away_last5"].get("att"))
-    def_h = to_float(p["home_last5"].get("def"))
-    def_a = to_float(p["away_last5"].get("def"))
-    str_h = to_float(p["strength"]["home"])
-    str_a = to_float(p["strength"]["away"])
-
-    ws.append([
-        p["date"],
-        p["league"],
-        p["teams"]["home"],
-        p["teams"]["away"],
-        p["advice"],
-        p["home_form"],
-        p["away_form"],
-        att_h, att_a, att_h - att_a,
-        def_h, def_a, def_h - def_a,
-        str_h, str_a, str_h - str_a
-    ])
+        att_h = to_float(p["home_last5"].get("att"))
+        att_a = to_float(p["away_last5"].get("att"))
+        def_h = to_float(p["home_last5"].get("def"))
+        def_a = to_float(p["away_last5"].get("def"))
+        str_h = to_float(p["strength"]["home"])
+        str_a = to_float(p["strength"]["away"])
+    
+        ws.append([
+            p["date"],
+            p["league"],
+            p["teams"]["home"],
+            p["teams"]["away"],
+            p["advice"],
+            p["home_form"],
+            p["away_form"],
+            att_h, att_a, att_h - att_a,
+            def_h, def_a, def_h - def_a,
+            str_h, str_a, str_h - str_a
+        ])
 
     max_row = ws.max_row
 
@@ -376,6 +376,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
