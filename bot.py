@@ -26,7 +26,7 @@ from openpyxl.formatting.rule import ColorScaleRule
 # CONFIG (ENV)
 # ======================================================
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-FOOTBALL_API_KEY = os.environ["FOOTBALL_API_KEY"]
+FOOTBALL_API_KEY = os.environ["API_KEY"]
 WEBHOOK_URL = os.environ["WEBHOOK_URL"]
 
 API_HOST = "https://v3.football.api-sports.io"
@@ -327,3 +327,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
