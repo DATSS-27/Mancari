@@ -70,11 +70,11 @@ def load_state():
         FIXTURE_IDS = []
 
 def reset_state():
-    global SELECTED_LEAGUE, FIXTURE_IDS
+    global SELECTED_LEAGUE, FIXTURE_IDS, SELECTED_LEAGUE_IDS
     SELECTED_LEAGUE = {}
     FIXTURE_IDS = []
-    save_state()  # overwrite file with empty state
-
+    SELECTED_LEAGUE_IDS.clear()
+    save_state()
 # ======================================================
 # UTILITIES
 # ======================================================
@@ -109,27 +109,32 @@ def build_predictions_excel(predictions):
         "Def Home", "Def Away", "Δ Def",
         "Strength Home", "Strength Away", "Δ Strength"
     ])
-
+    def to_float(val):
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return 0.0
+        
     for p in predictions:
-        att_h = p["home_last5"].get("att", 0)
-        att_a = p["away_last5"].get("att", 0)
-        def_h = p["home_last5"].get("def", 0)
-        def_a = p["away_last5"].get("def", 0)
-        str_h = p["strength"]["home"]
-        str_a = p["strength"]["away"]
+    att_h = to_float(p["home_last5"].get("att"))
+    att_a = to_float(p["away_last5"].get("att"))
+    def_h = to_float(p["home_last5"].get("def"))
+    def_a = to_float(p["away_last5"].get("def"))
+    str_h = to_float(p["strength"]["home"])
+    str_a = to_float(p["strength"]["away"])
 
-        ws.append([
-            p["date"],
-            p["league"],
-            p["teams"]["home"],
-            p["teams"]["away"],
-            p["advice"],
-            p["home_form"],
-            p["away_form"],
-            att_h, att_a, att_h - att_a,
-            def_h, def_a, def_h - def_a,
-            str_h, str_a, str_h - str_a
-        ])
+    ws.append([
+        p["date"],
+        p["league"],
+        p["teams"]["home"],
+        p["teams"]["away"],
+        p["advice"],
+        p["home_form"],
+        p["away_form"],
+        att_h, att_a, att_h - att_a,
+        def_h, def_a, def_h - def_a,
+        str_h, str_a, str_h - str_a
+    ])
 
     max_row = ws.max_row
 
@@ -199,7 +204,7 @@ async def jadwal(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
         [InlineKeyboardButton(name, callback_data=f"league:{lid}")]
-        for lid, name in sorted(leagues.items(), key=lambda x: x[1])
+        for lid, name in sorted(leagues.items(), key=lambda x: x[0])
     ]
 
     await update.message.reply_text(
@@ -209,40 +214,73 @@ async def jadwal(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ======================================================
 # CALLBACK: LEAGUE SELECTED
 # ======================================================
-async def league_selected(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global SELECTED_LEAGUE, FIXTURE_IDS
+async def league_multi_select(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global SELECTED_LEAGUE_IDS, FIXTURE_IDS
 
     query = update.callback_query
     await query.answer()
 
-    league_id = int(query.data.split(":")[1])
+    data = query.data
 
-    fixtures = context.bot_data.get("fixtures", [])
-    leagues = context.bot_data.get("leagues", {})
+    # ===============================
+    # TOGGLE LEAGUE
+    # ===============================
+    if data.startswith("toggle:"):
+        league_id = int(data.split(":")[1])
 
-    FIXTURE_IDS = [
-        f["fixture"]["id"]
-        for f in fixtures
-        if f["league"]["id"] == league_id
-    ][:15]
+        if league_id in SELECTED_LEAGUE_IDS:
+            SELECTED_LEAGUE_IDS.remove(league_id)
+        else:
+            SELECTED_LEAGUE_IDS.add(league_id)
 
-    if not FIXTURE_IDS:
-        await query.edit_message_text("Tidak ada fixture di liga ini.")
+        fixtures = context.bot_data.get("fixtures", [])
+        leagues = context.bot_data.get("leagues", {})
+
+        keyboard = []
+        for lid, name in sorted(leagues.items(), key=lambda x: x[0]):
+            checked = "✅ " if lid in SELECTED_LEAGUE_IDS else ""
+            keyboard.append([
+                InlineKeyboardButton(
+                    f"{checked}{name}",
+                    callback_data=f"toggle:{lid}"
+                )
+            ])
+
+        keyboard.append([
+            InlineKeyboardButton("📌 Selesai Pilih Liga", callback_data="done")
+        ])
+
+        await query.edit_message_reply_markup(
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
         return
 
-    SELECTED_LEAGUE = {
-        "id": league_id,
-        "name": leagues.get(league_id, "")
-    }
+    # ===============================
+    # DONE / CONFIRM
+    # ===============================
+    if data == "done":
+        if not SELECTED_LEAGUE_IDS:
+            await query.edit_message_text("❌ Belum ada liga yang dipilih.")
+            return
 
-    save_state()
+        fixtures = context.bot_data.get("fixtures", [])
+        leagues = context.bot_data.get("leagues", {})
 
-    await query.edit_message_text(
-        f"✅ Liga dipilih: *{SELECTED_LEAGUE['name']}*\n"
-        f"📌 Total pertandingan: *{len(FIXTURE_IDS)}*",
-        parse_mode="Markdown"
-    )
+        FIXTURE_IDS = [
+            f["fixture"]["id"]
+            for f in fixtures
+            if f["league"]["id"] in SELECTED_LEAGUE_IDS
+        ]
 
+        league_names = [
+            leagues[lid] for lid in sorted(SELECTED_LEAGUE_IDS)
+        ]
+
+        await query.edit_message_text(
+            "✅ Liga dipilih:\n• "
+            + "\n• ".join(league_names)
+            + f"\n\n📌 Total pertandingan: {len(FIXTURE_IDS)}"
+        )
 # ======================================================
 # COMMAND: /prediksi
 # ======================================================
@@ -316,7 +354,6 @@ async def prediksi(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ✅ PALING PENTING: RESET FILE & STATE
     reset_state()
-
 # ======================================================
 # MAIN (WEBHOOK)
 # ======================================================
@@ -327,7 +364,7 @@ def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("jadwal", jadwal))
-    app.add_handler(CallbackQueryHandler(league_selected, pattern="^league:"))
+    app.add_handler(CallbackQueryHandler(league_multi_select))
     app.add_handler(CommandHandler("prediksi", prediksi))
 
     app.run_webhook(
@@ -339,6 +376,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
