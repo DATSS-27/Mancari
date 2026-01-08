@@ -202,10 +202,20 @@ async def jadwal(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     context.bot_data["leagues"] = leagues
 
-    keyboard = [
-        [InlineKeyboardButton(name, callback_data=f"league:{lid}")]
-        for lid, name in sorted(leagues.items(), key=lambda x: x[0])
-    ]
+    keyboard = []
+
+    for lid, name in sorted(leagues.items(), key=lambda x: x[0]):
+        checked = "✅ " if lid in SELECTED_LEAGUE_IDS else ""
+        keyboard.append([
+            InlineKeyboardButton(
+                f"{checked}{name}",
+                callback_data=f"toggle:{lid}"
+            )
+        ])
+    
+    keyboard.append([
+        InlineKeyboardButton("📌 Selesai Pilih Liga", callback_data="done")
+    ])
 
     await update.message.reply_text(
         f"⚽ Pilih liga (tanggal {today}):",
@@ -376,6 +386,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
