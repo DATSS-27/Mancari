@@ -154,11 +154,13 @@ def build_predictions_excel(predictions):
 # ======================================================
 # COMMAND: /jadwal
 # ======================================================
+from datetime import datetime
+
 async def jadwal(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    d = datetime.now()
+    today = datetime.now().strftime("%Y-%m-%d")
 
     params = {
-        "date": d.strftime("%Y-%m-%d"),
+        "date": today,
         "status": "NS",
         "timezone": "Asia/Makassar",
     }
@@ -171,13 +173,18 @@ async def jadwal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     data = r.json()
-    if not data.get("response"):
-        await update.message.reply_text("Tidak ada pertandingan hari ini.")
+    fixtures = data.get("response", [])
+
+    if not fixtures:
+        await update.message.reply_text(
+            "⚠️ Tidak ada pertandingan hari ini."
+        )
         return
 
-    fixtures = data["response"]
+    # SIMPAN FIXTURES KE BOT DATA
     context.bot_data["fixtures"] = fixtures
 
+    # KUMPULKAN LIGA (TANPA TAMPILKAN ID)
     leagues = {}
     for f in fixtures:
         leagues[f["league"]["id"]] = f["league"]["name"]
@@ -190,10 +197,9 @@ async def jadwal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await update.message.reply_text(
-        "⚽ Pilih liga:",
+        "⚽ Pilih liga (hari ini):",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
-
 # ======================================================
 # CALLBACK: LEAGUE SELECTED
 # ======================================================
@@ -327,4 +333,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
