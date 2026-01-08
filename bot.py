@@ -110,10 +110,10 @@ def build_predictions_excel(predictions):
         "Strength Home", "Strength Away", "Δ Strength"
     ])
     def to_float(val):
-    try:
-        return float(val)
-    except (TypeError, ValueError):
-        return 0.0
+        try:
+            return float(val)
+        except (TypeError, ValueError):
+            return 0.0
         
     for p in predictions:
     att_h = to_float(p["home_last5"].get("att"))
@@ -376,6 +376,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
