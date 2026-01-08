@@ -4,6 +4,7 @@ import asyncio
 import aiohttp
 import requests
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from io import BytesIO
 
 from telegram import (
@@ -157,8 +158,9 @@ def build_predictions_excel(predictions):
 from datetime import datetime
 
 async def jadwal(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    today = datetime.now().strftime("%Y-%m-%d")
-
+    now_local = datetime.now(ZoneInfo("Asia/Makassar"))
+    today = now_local.strftime("%Y-%m-%d")
+    
     params = {
         "date": today,
         "status": "ns",
@@ -333,6 +335,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
