@@ -161,7 +161,7 @@ async def jadwal(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     params = {
         "date": today,
-        "status": "NS",
+        "status": "ns",
         "timezone": "Asia/Makassar",
     }
 
@@ -333,5 +333,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
